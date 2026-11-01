@@ -1,0 +1,8 @@
+com\mycompany\bioskop\DapatDinilai.class
+com\mycompany\bioskop\DapatDipesan.class
+com\mycompany\bioskop\Film3D.class
+com\mycompany\bioskop\Film.class
+com\mycompany\bioskop\FilmTidakDitemukanException.class
+com\mycompany\bioskop\Bioskop.class
+com\mycompany\bioskop\Film2D.class
+com\mycompany\bioskop\FilmPremium.class
