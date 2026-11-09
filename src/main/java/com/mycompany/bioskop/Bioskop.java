@@ -1,422 +1,236 @@
 package com.mycompany.bioskop;
 
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.InputMismatchException;
 
 public class Bioskop {
 
-    public static void main(String[] args) {
+    private ArrayList<Film> daftarFilm;
+    private HashMap<String, Pelanggan> daftarPelanggan;
 
-        Scanner scanner = new Scanner(System.in);
+    private FasilitasBioskop fasilitas;
+    private TransaksiPemesanan transaksi;
 
-        // ArrayList untuk menyimpan data film
-        ArrayList<Film> daftarFilm = new ArrayList<>();
+    public Bioskop() {
 
-        // HashMap untuk menyimpan data pelanggan
-        HashMap<String, String> dataPelanggan = new HashMap<>();
+        daftarFilm = new ArrayList<>();
+        daftarPelanggan = new HashMap<>();
 
-        // Data awal film
-        daftarFilm.add(
-                new Film2D("Avengers", 101, "12:00", 1));
+        // COMPOSITION
+        fasilitas = new FasilitasBioskop();
 
-        daftarFilm.add(
-                new Film3D("Avatar", 102, "15:00", 2));
+        transaksi = new TransaksiPemesanan();
+    }
 
-        daftarFilm.add(
-                new FilmPremium("Interstellar", 103, "19:00", 3));
+    // AGGREGATION
+    public void tambahFilm(Film film) {
+        daftarFilm.add(film);
+    }
 
-        // Data awal pelanggan
-        dataPelanggan.put("P001", "Budi");
-        dataPelanggan.put("P002", "Siti");
-        dataPelanggan.put("P003", "Andi");
+    public void tambahPelanggan(Pelanggan pelanggan) {
+        daftarPelanggan.put(
+            pelanggan.getIdPelanggan(), pelanggan
+        );
+    }
 
-        boolean isRunning = true;
+    public void tampilkanFilm() {
 
-        System.out.println("================================");
-        System.out.println("       SISTEM BIOSKOP KITA");
-        System.out.println("================================");
+        System.out.println("===== DAFTAR FILM =====");
 
-        while (isRunning) {
+        for (Film film : daftarFilm) {
+            film.tampilkanInfo();
+            film.tampilkanJenisFilm();
+            System.out.println("----------------------");
+        }
+    }
+
+    public void tampilkanPelanggan() {
+
+        System.out.println("===== DAFTAR PELANGGAN =====");
+
+        for (Pelanggan pelanggan : daftarPelanggan.values()) {
+            pelanggan.tampilkanInfo();
+            System.out.println("----------------------");
+        }
+    }
+
+    public Film cariFilm(int nomorFilm)
+            throws FilmTidakDitemukanException {
+
+        for (Film film : daftarFilm) {
+            if (film.getNomorFilm() == nomorFilm) {
+                return film;
+            }
+        }
+
+        throw new FilmTidakDitemukanException(
+            "Film tidak ditemukan."
+        );
+    }
+
+    public Pelanggan cariPelanggan(String idPelanggan) {
+        return daftarPelanggan.get(idPelanggan);
+    }
+
+    // ASSOCIATION
+    public void pesanTiket(Pelanggan pelanggan, Film film) {
+        transaksi.prosesTransaksi(pelanggan, film);
+    }
+
+    public void tampilkanFasilitas() {
+        fasilitas.tampilkanFasilitas();
+    }
+
+    public void menu() {
+
+        Scanner input = new Scanner(System.in);
+
+        int pilihan = 0;
+
+        do {
+
+            System.out.println("\n===== SISTEM BIOSKOP KITA =====");
+            System.out.println("1. Lihat Daftar Film");
+            System.out.println("2. Cari Film");
+            System.out.println("3. Lihat Daftar Pelanggan");
+            System.out.println("4. Pesan Tiket");
+            System.out.println("5. Lihat Fasilitas Bioskop");
+            System.out.println("6. Keluar");
+            System.out.print("Pilih menu: ");
 
             try {
 
-                System.out.println();
-                System.out.println("1. Tambah Jadwal Film");
-                System.out.println("2. Jadwal Film");
-                System.out.println("3. Cari Film");
-                System.out.println("4. Pesan Tiket");
-                System.out.println("5. Beri Rating");
-                System.out.println("6. Kelola Pelanggan");
-                System.out.println("7. Keluar");
-                System.out.print("Pilih menu: ");
-
-                int pilihan = scanner.nextInt();
-                scanner.nextLine();
+                pilihan = input.nextInt();
 
                 switch (pilihan) {
 
                     case 1:
-
-                        System.out.println();
-                        System.out.println("===== TAMBAH JADWAL FILM =====");
-
-                        System.out.print("Judul film: ");
-                        String judul = scanner.nextLine();
-
-                        System.out.print("Nomor film: ");
-                        int nomorFilm = scanner.nextInt();
-                        scanner.nextLine();
-
-                        System.out.print("Jam tayang: ");
-                        String jamTayang = scanner.nextLine();
-
-                        System.out.println();
-                        System.out.println("Pilih jenis film:");
-                        System.out.println("1. Film 2D");
-                        System.out.println("2. Film 3D");
-                        System.out.println("3. Film Premium");
-                        System.out.print("Pilih: ");
-
-                        int jenisFilm = scanner.nextInt();
-                        scanner.nextLine();
-
-                        if (jenisFilm >= 1 && jenisFilm <= 3) {
-
-                            System.out.print("Nomor studio: ");
-                            int studio = scanner.nextInt();
-                            scanner.nextLine();
-
-                            if (jenisFilm == 1) {
-
-                                daftarFilm.add(
-                                        new Film2D(
-                                                judul,
-                                                nomorFilm,
-                                                jamTayang,
-                                                studio));
-
-                            } else if (jenisFilm == 2) {
-
-                                daftarFilm.add(
-                                        new Film3D(
-                                                judul,
-                                                nomorFilm,
-                                                jamTayang,
-                                                studio));
-
-                            } else {
-
-                                daftarFilm.add(
-                                        new FilmPremium(
-                                                judul,
-                                                nomorFilm,
-                                                jamTayang,
-                                                studio));
-                            }
-
-                            System.out.println(
-                                    "Jadwal film berhasil ditambahkan.");
-
-                        } else {
-
-                            System.out.println(
-                                    "Jenis film tidak tersedia.");
-                        }
-
+                        tampilkanFilm();
                         break;
 
                     case 2:
 
-                        System.out.println();
-                        System.out.println("===== JADWAL FILM =====");
+                        System.out.print("Masukkan Nomor Film: ");
+                        int nomor = input.nextInt();
 
-                        System.out.println(
-                                "Jumlah film: " + daftarFilm.size());
+                        try {
 
-                        if (daftarFilm.isEmpty()) {
+                            Film film = cariFilm(nomor);
 
-                            System.out.println(
-                                    "Tidak ada jadwal film.");
+                            System.out.println("Film ditemukan!");
+                            film.tampilkanInfo();
+                            film.tampilkanJenisFilm();
 
-                        } else {
+                        } catch (FilmTidakDitemukanException e) {
 
-                            for (int i = 0; i < daftarFilm.size(); i++) {
-
-                                System.out.println();
-
-                                daftarFilm.get(i).tampilkanInfo();
-                            }
+                            System.out.println(e.getMessage());
                         }
 
                         break;
 
                     case 3:
-
-                        System.out.println();
-                        System.out.println("===== CARI FILM =====");
-
-                        System.out.print(
-                                "Masukkan judul atau nomor film: ");
-
-                        String kataKunci = scanner.nextLine();
-
-                        try {
-
-                            cariFilm(daftarFilm, kataKunci);
-
-                        } catch (FilmTidakDitemukanException e) {
-
-                            System.out.println(
-                                    "Pesan Error: " + e.getMessage());
-
-                        } finally {
-
-                            System.out.println(
-                                    "Proses pencarian film selesai.");
-                        }
-
+                        tampilkanPelanggan();
                         break;
 
                     case 4:
 
-                        System.out.println();
-                        System.out.println("===== PESAN TIKET =====");
+                        input.nextLine();
 
-                        System.out.print("Masukkan nomor film: ");
-                        int nomorPesan = scanner.nextInt();
-                        scanner.nextLine();
+                        System.out.print("Masukkan ID Pelanggan: ");
+                        String id = input.nextLine();
 
-                        boolean ditemukan = false;
+                        Pelanggan pelanggan = cariPelanggan(id);
 
-                        for (int i = 0; i < daftarFilm.size(); i++) {
+                        if (pelanggan == null) {
 
-                            if (daftarFilm.get(i).getNomorFilm()
-                                    == nomorPesan) {
+                            System.out.println("Pelanggan tidak ditemukan!");
 
-                                pesanTiket(daftarFilm.get(i));
+                        } else {
 
-                                ditemukan = true;
-                                break;
+                            System.out.print("Masukkan Nomor Film: ");
+                            int nomorFilm = input.nextInt();
+
+                            try {
+
+                                Film film = cariFilm(nomorFilm);
+
+                                pesanTiket(pelanggan, film);
+
+                            } catch (FilmTidakDitemukanException e) {
+
+                                System.out.println(e.getMessage());
                             }
-                        }
-
-                        if (!ditemukan) {
-
-                            System.out.println(
-                                    "Film tidak ditemukan.");
                         }
 
                         break;
 
                     case 5:
-
-                        System.out.println();
-                        System.out.println("===== BERI RATING =====");
-
-                        System.out.print("Masukkan nomor film: ");
-                        int nomorRating = scanner.nextInt();
-                        scanner.nextLine();
-
-                        boolean filmDitemukan = false;
-
-                        for (int i = 0; i < daftarFilm.size(); i++) {
-
-                            if (daftarFilm.get(i).getNomorFilm()
-                                    == nomorRating) {
-
-                                filmDitemukan = true;
-
-                                if (daftarFilm.get(i)
-                                        instanceof DapatDinilai) {
-
-                                    DapatDinilai filmDinilai =
-                                            (DapatDinilai) daftarFilm.get(i);
-
-                                    filmDinilai.beriRating();
-
-                                } else {
-
-                                    System.out.println(
-                                            "Film tidak dapat diberi rating.");
-                                }
-
-                                break;
-                            }
-                        }
-
-                        if (!filmDitemukan) {
-
-                            System.out.println(
-                                    "Film tidak ditemukan.");
-                        }
-
+                        tampilkanFasilitas();
                         break;
 
                     case 6:
-
-                        kelolaPelanggan(scanner, dataPelanggan);
-
-                        break;
-
-                    case 7:
-
-                        isRunning = false;
-
-                        System.out.println();
-                        System.out.println(
-                                "Terima kasih telah menggunakan "
-                                + "Sistem Bioskop Kita.");
-
+                        System.out.println("Terima kasih!");
                         break;
 
                     default:
-
-                        System.out.println(
-                                "Pilihan tidak tersedia.");
+                        System.out.println("Pilihan tidak tersedia.");
                 }
 
             } catch (InputMismatchException e) {
 
-                System.out.println(
-                        "Pesan Error: Input harus berupa angka!");
-
-                scanner.nextLine();
-
+                System.out.println("Input harus berupa angka!");
+                input.nextLine();
             }
-        }
 
-        scanner.close();
+        } while (pilihan != 6);
 
-        System.out.println(
-                "Blok finally: Scanner berhasil ditutup.");
+        input.close();
     }
 
-    // Runtime Polymorphism dan Dynamic Binding
+    public static void main(String[] args) {
 
-    public static void pesanTiket(Film film) {
+        // Membuat objek Bioskop
+        Bioskop bioskop = new Bioskop();
 
-        System.out.println();
-        System.out.println("===== TIKET DIPESAN =====");
+        // Membuat objek Film di luar kelas Bioskop
+        Film film1 = new Film2D(
+            "Avengers", 1, "10:00", 1
+        );
 
-        film.tampilkanInfo();
+        Film film2 = new Film3D(
+            "Avatar", 2, "13:00", 2
+        );
 
-        if (film instanceof DapatDipesan) {
+        Film film3 = new FilmPremium(
+            "Interstellar", 3, "16:00", 1
+        );
 
-            DapatDipesan pemesanan =
-                    (DapatDipesan) film;
+        // Menambahkan film ke Bioskop
+        bioskop.tambahFilm(film1);
+        bioskop.tambahFilm(film2);
+        bioskop.tambahFilm(film3);
 
-            pemesanan.prosesPemesanan();
+        // Membuat objek Pelanggan
+        Pelanggan pelanggan1 = new Pelanggan(
+            "P001", "Budi"
+        );
 
-        } else {
+        Pelanggan pelanggan2 = new Pelanggan(
+            "P002", "Siti"
+        );
 
-            System.out.println(
-                    "Film ini tidak dapat dipesan.");
-        }
-    }
+        Pelanggan pelanggan3 = new Pelanggan(
+            "P003", "Andi"
+        );
 
-    // Exception Handling: throw dan throws
+        // Menambahkan pelanggan ke Bioskop
+        bioskop.tambahPelanggan(pelanggan1);
+        bioskop.tambahPelanggan(pelanggan2);
+        bioskop.tambahPelanggan(pelanggan3);
 
-    public static void cariFilm(
-            ArrayList<Film> daftarFilm,
-            String kataKunci)
-            throws FilmTidakDitemukanException {
-
-        boolean ditemukan = false;
-
-        if (kataKunci.trim().isEmpty()) {
-
-            throw new FilmTidakDitemukanException(
-                    "Kata kunci pencarian tidak boleh kosong.");
-        }
-
-        for (int i = 0; i < daftarFilm.size(); i++) {
-
-            Film film = daftarFilm.get(i);
-
-            if (film.getJudul().equalsIgnoreCase(kataKunci)
-                    || String.valueOf(film.getNomorFilm())
-                            .equals(kataKunci)) {
-
-                film.tampilkanInfo();
-
-                ditemukan = true;
-            }
-        }
-
-        if (!ditemukan) {
-
-            throw new FilmTidakDitemukanException(
-                    "Film tidak ditemukan.");
-        }
-    }
-
-    // Mengelola data pelanggan menggunakan HashMap
-
-    public static void kelolaPelanggan(
-            Scanner scanner,
-            HashMap<String, String> dataPelanggan) {
-
-        System.out.println();
-        System.out.println("===== KELOLA PELANGGAN =====");
-
-        System.out.println("1. Tambah Pelanggan");
-        System.out.println("2. Cari Pelanggan");
-        System.out.println("3. Tampilkan Semua Pelanggan");
-        System.out.print("Pilih: ");
-
-        int pilihan = scanner.nextInt();
-        scanner.nextLine();
-
-        if (pilihan == 1) {
-
-            System.out.print("Masukkan ID pelanggan: ");
-            String id = scanner.nextLine();
-
-            System.out.print("Masukkan nama pelanggan: ");
-            String nama = scanner.nextLine();
-
-            dataPelanggan.put(id, nama);
-
-            System.out.println(
-                    "Data pelanggan berhasil ditambahkan.");
-
-        } else if (pilihan == 2) {
-
-            System.out.print("Masukkan ID pelanggan: ");
-            String id = scanner.nextLine();
-
-            if (dataPelanggan.containsKey(id)) {
-
-                System.out.println(
-                        "Nama pelanggan: " + dataPelanggan.get(id));
-
-            } else {
-
-                System.out.println(
-                        "Pelanggan tidak ditemukan.");
-            }
-
-        } else if (pilihan == 3) {
-
-            System.out.println();
-            System.out.println("===== DAFTAR PELANGGAN =====");
-
-            System.out.println(
-                    "Jumlah pelanggan: " + dataPelanggan.size());
-
-            for (String id : dataPelanggan.keySet()) {
-
-                System.out.println(
-                        "ID: " + id
-                        + " | Nama: " + dataPelanggan.get(id));
-            }
-
-        } else {
-
-            System.out.println(
-                    "Pilihan tidak tersedia.");
-        }
+        // Menjalankan menu
+        bioskop.menu();
     }
 }

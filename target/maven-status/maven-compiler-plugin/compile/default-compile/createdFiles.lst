@@ -4,5 +4,8 @@ com\mycompany\bioskop\Film3D.class
 com\mycompany\bioskop\Film.class
 com\mycompany\bioskop\FilmTidakDitemukanException.class
 com\mycompany\bioskop\Bioskop.class
+com\mycompany\bioskop\TransaksiPemesanan.class
+com\mycompany\bioskop\Pelanggan.class
+com\mycompany\bioskop\FasilitasBioskop.class
 com\mycompany\bioskop\Film2D.class
 com\mycompany\bioskop\FilmPremium.class
