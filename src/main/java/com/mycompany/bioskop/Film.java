@@ -1,6 +1,10 @@
 package com.mycompany.bioskop;
 
-public abstract class Film {
+import java.io.Serializable;
+
+public abstract class Film implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String judul;
     private int nomorFilm;
@@ -56,8 +60,6 @@ public abstract class Film {
 
         tampilkanJenisFilm();
     }
-
-    // Abstract method yang wajib di-override oleh subclass
 
     public abstract void tampilkanJenisFilm();
 }

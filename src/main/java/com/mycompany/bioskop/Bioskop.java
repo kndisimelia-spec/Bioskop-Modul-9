@@ -5,6 +5,15 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.InputMismatchException;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+
 public class Bioskop {
 
     private ArrayList<Film> daftarFilm;
@@ -18,7 +27,6 @@ public class Bioskop {
         daftarFilm = new ArrayList<>();
         daftarPelanggan = new HashMap<>();
 
-        // COMPOSITION
         fasilitas = new FasilitasBioskop();
 
         transaksi = new TransaksiPemesanan();
@@ -31,7 +39,7 @@ public class Bioskop {
 
     public void tambahPelanggan(Pelanggan pelanggan) {
         daftarPelanggan.put(
-            pelanggan.getIdPelanggan(), pelanggan
+                pelanggan.getIdPelanggan(), pelanggan
         );
     }
 
@@ -66,7 +74,7 @@ public class Bioskop {
         }
 
         throw new FilmTidakDitemukanException(
-            "Film tidak ditemukan."
+                "Film tidak ditemukan."
         );
     }
 
@@ -83,6 +91,99 @@ public class Bioskop {
         fasilitas.tampilkanFasilitas();
     }
 
+    // SERIALIZATION
+    public void simpanDataKeFile() {
+
+        try {
+
+            FileOutputStream fileKeluar =
+                    new FileOutputStream("data_bioskop.dat");
+
+            ObjectOutputStream mesinPembeku =
+                    new ObjectOutputStream(fileKeluar);
+
+            mesinPembeku.writeObject(daftarFilm);
+            mesinPembeku.writeObject(daftarPelanggan);
+
+            mesinPembeku.close();
+
+            System.out.println("Data bioskop berhasil disimpan!");
+
+        } catch (Exception e) {
+
+            System.out.println("Gagal menyimpan data: "
+                    + e.getMessage());
+        }
+    }
+
+    // DESERIALIZATION
+    public boolean muatDataDariFile() {
+
+        File file = new File("data_bioskop.dat");
+
+        if (!file.exists()) {
+            System.out.println("File data belum tersedia.");
+            return false;
+        }
+
+        try {
+
+            FileInputStream fileMasuk =
+                    new FileInputStream("data_bioskop.dat");
+
+            ObjectInputStream mesinPembangkit =
+                    new ObjectInputStream(fileMasuk);
+
+            daftarFilm = (ArrayList<Film>)
+                    mesinPembangkit.readObject();
+
+            daftarPelanggan = (HashMap<String, Pelanggan>)
+                    mesinPembangkit.readObject();
+
+            mesinPembangkit.close();
+
+            System.out.println("Data bioskop berhasil dimuat!");
+
+            return true;
+
+        } catch (Exception e) {
+
+            System.out.println("Gagal memuat data: "
+                    + e.getMessage());
+
+            return false;
+        }
+    }
+
+    // MEMBACA FILE LOG
+    public void bacaLogTransaksi() {
+
+        try {
+
+            File fileYangDibaca =
+                    new File("log_transaksi.txt");
+
+            Scanner mesinBaca =
+                    new Scanner(fileYangDibaca);
+
+            System.out.println("===== LOG TRANSAKSI =====");
+
+            while (mesinBaca.hasNextLine()) {
+
+                String barisTeks = mesinBaca.nextLine();
+
+                System.out.println(barisTeks);
+            }
+
+            mesinBaca.close();
+
+        } catch (FileNotFoundException e) {
+
+            System.out.println("File log transaksi belum ditemukan.");
+        }
+    }
+
+    // MENU PROGRAM
     public void menu() {
 
         Scanner input = new Scanner(System.in);
@@ -97,7 +198,11 @@ public class Bioskop {
             System.out.println("3. Lihat Daftar Pelanggan");
             System.out.println("4. Pesan Tiket");
             System.out.println("5. Lihat Fasilitas Bioskop");
-            System.out.println("6. Keluar");
+            System.out.println("6. Simpan Data");
+            System.out.println("7. Muat Data");
+            System.out.println("8. Lihat Log Transaksi");
+            System.out.println("9. Keluar");
+
             System.out.print("Pilih menu: ");
 
             try {
@@ -171,7 +276,23 @@ public class Bioskop {
                         break;
 
                     case 6:
+                        simpanDataKeFile();
+                        break;
+
+                    case 7:
+                        muatDataDariFile();
+                        break;
+
+                    case 8:
+                        bacaLogTransaksi();
+                        break;
+
+                    case 9:
+
+                        simpanDataKeFile();
+
                         System.out.println("Terima kasih!");
+
                         break;
 
                     default:
@@ -181,56 +302,58 @@ public class Bioskop {
             } catch (InputMismatchException e) {
 
                 System.out.println("Input harus berupa angka!");
+
                 input.nextLine();
             }
 
-        } while (pilihan != 6);
+        } while (pilihan != 9);
 
         input.close();
     }
 
     public static void main(String[] args) {
 
-        // Membuat objek Bioskop
         Bioskop bioskop = new Bioskop();
 
-        // Membuat objek Film di luar kelas Bioskop
-        Film film1 = new Film2D(
-            "Avengers", 1, "10:00", 1
-        );
+        // Memuat data saat program pertama dijalankan
+        boolean dataTersedia = bioskop.muatDataDariFile();
 
-        Film film2 = new Film3D(
-            "Avatar", 2, "13:00", 2
-        );
+        // Jika belum ada file, gunakan data awal
+        if (!dataTersedia) {
 
-        Film film3 = new FilmPremium(
-            "Interstellar", 3, "16:00", 1
-        );
+            Film film1 = new Film2D(
+                    "Avengers", 1, "10:00", 1
+            );
 
-        // Menambahkan film ke Bioskop
-        bioskop.tambahFilm(film1);
-        bioskop.tambahFilm(film2);
-        bioskop.tambahFilm(film3);
+            Film film2 = new Film3D(
+                    "Avatar", 2, "13:00", 2
+            );
 
-        // Membuat objek Pelanggan
-        Pelanggan pelanggan1 = new Pelanggan(
-            "P001", "Budi"
-        );
+            Film film3 = new FilmPremium(
+                    "Interstellar", 3, "16:00", 1
+            );
 
-        Pelanggan pelanggan2 = new Pelanggan(
-            "P002", "Siti"
-        );
+            bioskop.tambahFilm(film1);
+            bioskop.tambahFilm(film2);
+            bioskop.tambahFilm(film3);
 
-        Pelanggan pelanggan3 = new Pelanggan(
-            "P003", "Andi"
-        );
+            Pelanggan pelanggan1 = new Pelanggan(
+                    "P001", "Budi"
+            );
 
-        // Menambahkan pelanggan ke Bioskop
-        bioskop.tambahPelanggan(pelanggan1);
-        bioskop.tambahPelanggan(pelanggan2);
-        bioskop.tambahPelanggan(pelanggan3);
+            Pelanggan pelanggan2 = new Pelanggan(
+                    "P002", "Siti"
+            );
 
-        // Menjalankan menu
+            Pelanggan pelanggan3 = new Pelanggan(
+                    "P003", "Andi"
+            );
+
+            bioskop.tambahPelanggan(pelanggan1);
+            bioskop.tambahPelanggan(pelanggan2);
+            bioskop.tambahPelanggan(pelanggan3);
+        }
+
         bioskop.menu();
     }
 }

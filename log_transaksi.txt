@@ -1,0 +1,12 @@
+===== RIWAYAT PEMESANAN =====
+Nama Pelanggan : Budi
+Film           : Avengers
+Jam Tayang     : 10:00
+Status         : Berhasil
+-----------------------------
+===== RIWAYAT PEMESANAN =====
+Nama Pelanggan : Budi
+Film           : Avengers
+Jam Tayang     : 10:00
+Status         : Berhasil
+-----------------------------
